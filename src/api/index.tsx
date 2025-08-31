@@ -11,7 +11,7 @@ export const ApiProvider = ({
   children,
 }: ApiProviderProps): React.ReactElement => {
   const apiClient = axios.create({
-    baseURL: "https://api-vanadristi.snehkr.in/api/v1",
+    baseURL: "https://vanadristi-api.snehkr.in/api/v1",
     headers: { "Content-Type": "application/json" },
   });
 
