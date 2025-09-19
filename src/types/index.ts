@@ -10,10 +10,14 @@ export interface SensorData {
   plant_id: string;
   plant_name: string;
   timestamp: string;
-  soil_moisture?: number;
   temperature?: number;
   humidity?: number;
-  light?: number;
+  soil_data?: {
+    Soil_Moisture?: number;
+    Soil_ADC?: number;
+    Soil_Voltage?: number;
+  };
+  light_intensity?: number;
 }
 
 export interface TrendData {

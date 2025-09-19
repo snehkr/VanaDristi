@@ -144,10 +144,15 @@ const LatestSensorCard = ({
     {
       icon: Waves,
       label: "Moisture",
-      value: sensorData?.soil_moisture,
+      value: sensorData?.soil_data?.Soil_Moisture,
       unit: "%",
     },
-    { icon: Sun, label: "Light", value: sensorData?.light, unit: " lux" },
+    {
+      icon: Sun,
+      label: "Light",
+      value: sensorData?.light_intensity,
+      unit: " lux",
+    },
   ];
 
   return (

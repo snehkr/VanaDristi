@@ -29,14 +29,14 @@ const SensorDisplay = ({ plantId }: SensorDisplayProps): React.ReactElement => {
     {
       icon: Waves,
       label: "Soil Moisture",
-      value: data?.soil_moisture,
+      value: data?.soil_data?.Soil_Moisture,
       unit: "%",
       color: "text-blue-600",
     },
     {
       icon: Sun,
       label: "Light",
-      value: data?.light,
+      value: data?.light_intensity,
       unit: " lux",
       color: "text-amber-500",
     },
