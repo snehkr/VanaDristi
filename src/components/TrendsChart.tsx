@@ -39,7 +39,7 @@ const TrendsChart = ({ plantId }: TrendsChartProps): React.ReactElement => {
               margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="_id" tick={{ fontSize: 12 }} stroke="#6b7280" />
+              <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#6b7280" />
               <YAxis tick={{ fontSize: 12 }} stroke="#6b7280" />
               <Tooltip
                 contentStyle={{
