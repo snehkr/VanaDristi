@@ -1,230 +1,169 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useApi } from "../api/hooks";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
-import PlantForm from "../components/PlantForm";
-import { PlusCircle, Pencil, Trash2, Sprout } from "lucide-react";
-import type { Plant } from "@/types";
+import { toast } from "@/hooks/use-toast";
+import SelectablePlantCard from "../components/SelectablePlantCard";
+import { Sprout, Check } from "lucide-react";
 
 const ManagePlantsPage = (): React.ReactElement => {
-  const { useGetPlants, useDeletePlant } = useApi();
-  const { data: plants, isLoading } = useGetPlants();
-  const deletePlant = useDeletePlant();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
+  const {
+    useGetPlants,
+    useGetLatestPlant,
+    useSetLatestPlant,
+    useDeleteLatestPlant,
+  } = useApi();
 
-  const handleAddNew = () => {
-    setEditingPlant(null);
-    setIsDialogOpen(true);
+  const { data: plants, isLoading: isLoadingPlants } = useGetPlants();
+  const { data: latestPlant, isLoading: isLoadingLatestPlant } =
+    useGetLatestPlant();
+  const setLatestPlant = useSetLatestPlant();
+  const deleteLatestPlant = useDeleteLatestPlant();
+
+  const [selectedPlantId, setSelectedPlantId] = useState<string>("");
+  const [initialPlantId, setInitialPlantId] = useState<string>("");
+
+  useEffect(() => {
+    if (latestPlant?._id) {
+      setSelectedPlantId(latestPlant._id);
+      setInitialPlantId(latestPlant._id);
+    } else {
+      setSelectedPlantId("");
+      setInitialPlantId("");
+    }
+  }, [latestPlant]);
+
+  const handleSelectPlant = (plantId: string) => {
+    setSelectedPlantId(plantId);
   };
 
-  const handleEdit = (plant: Plant) => {
-    setEditingPlant(plant);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = (plantId: string) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this plant? This action cannot be undone."
-      )
-    ) {
-      deletePlant.mutate(plantId);
+  const handleSave = () => {
+    if (selectedPlantId) {
+      setLatestPlant.mutate(selectedPlantId, {
+        onSuccess: () => {
+          setInitialPlantId(selectedPlantId);
+          toast({
+            title: "Success!",
+            description: "Observation plant has been updated.",
+          });
+        },
+        onError: () => {
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: "Could not set the plant for observation.",
+          });
+        },
+      });
     }
   };
 
-  // Component for the empty state when no plants are found
+  const handleRemove = () => {
+    deleteLatestPlant.mutate(undefined, {
+      onSuccess: () => {
+        setSelectedPlantId("");
+        setInitialPlantId("");
+        toast({
+          title: "Success!",
+          description: "Observation plant has been removed.",
+        });
+      },
+      onError: () => {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "Could not remove the plant from observation.",
+        });
+      },
+    });
+  };
+
+  const isLoading = isLoadingPlants || isLoadingLatestPlant;
+  const isDirty = selectedPlantId !== initialPlantId;
+
   const EmptyState = () => (
-    <div className="text-center p-8 md:p-16">
+    <div className="text-center p-8 md:p-16 col-span-full">
       <Sprout className="mx-auto h-16 w-16 text-green-700 opacity-50" />
       <h3 className="mt-4 text-xl font-semibold text-stone-800">
         No Plants Found
       </h3>
       <p className="mt-2 text-sm text-stone-500">
-        It looks a little empty in here. Get started by adding your first plant.
+        It looks a little empty in here. Add a plant to get started.
       </p>
-      <Button onClick={handleAddNew} className="mt-6">
-        <PlusCircle className="mr-2 h-4 w-4" /> Add New Plant
-      </Button>
     </div>
   );
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-          <h1 className="text-4xl font-bold text-green-900">Manage Plants</h1>
-          <p className="text-stone-600 mt-1">
-            Add, edit, or remove your plants.
-          </p>
-        </div>
-        <Button onClick={handleAddNew} className="w-full sm:w-auto">
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Plant
-        </Button>
+      <div>
+        <h1 className="text-4xl font-bold text-green-900">
+          Observation Target
+        </h1>
+        <p className="text-stone-600 mt-1">
+          Choose which plant to use for active sensor observation.
+        </p>
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardHeader>
+          <CardTitle>Select a Plant</CardTitle>
+          <CardDescription>
+            Click on a plant below to select it for observation. The selected
+            plant will provide the data for the dashboard and other monitoring
+            features.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           {isLoading ? (
-            // Unified skeleton for both mobile and desktop
-            <div className="p-6 space-y-4">
-              <Skeleton className="h-10 w-full rounded-md" />
-              <Skeleton className="h-10 w-full rounded-md" />
-              <Skeleton className="h-10 w-full rounded-md" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-[120px] w-full" />
+              ))}
             </div>
           ) : !plants || plants.length === 0 ? (
             <EmptyState />
           ) : (
-            <div>
-              {/* Desktop Table View (hidden on small screens) */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-sm text-left text-stone-600">
-                  <thead className="text-xs text-stone-700 uppercase bg-stone-100/70">
-                    <tr>
-                      <th scope="col" className="px-6 py-4">
-                        Name
-                      </th>
-                      <th scope="col" className="px-6 py-4">
-                        Species
-                      </th>
-                      <th scope="col" className="px-6 py-4">
-                        Location
-                      </th>
-                      <th scope="col" className="px-6 py-4 text-right">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {plants.map((plant) => (
-                      <tr
-                        key={plant._id}
-                        className="bg-white border-b hover:bg-stone-50/50 transition-colors"
-                      >
-                        <td className="px-6 py-4 font-medium text-stone-900">
-                          {plant.name}
-                        </td>
-                        <td className="px-6 py-4">{plant.species || "N/A"}</td>
-                        <td className="px-6 py-4">{plant.location || "N/A"}</td>
-                        <td className="px-6 py-4 text-right">
-                          <TooltipProvider>
-                            <div className="flex justify-end space-x-2">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleEdit(plant)}
-                                  >
-                                    <Pencil className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Edit Plant</p>
-                                </TooltipContent>
-                              </Tooltip>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleDelete(plant._id)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Delete Plant</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          </TooltipProvider>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile Card View (hidden on medium screens and up) */}
-              <div className="md:hidden p-4 space-y-4 bg-stone-50">
-                {plants.map((plant) => (
-                  <Card key={plant._id} className="shadow-md">
-                    <CardHeader>
-                      <CardTitle>{plant.name}</CardTitle>
-                      <CardDescription>
-                        {plant.species || "No species specified"}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-stone-600">
-                        <strong>Location:</strong> {plant.location || "N/A"}
-                      </p>
-                    </CardContent>
-                    <CardFooter className="flex justify-end space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(plant)}
-                      >
-                        <Pencil className="mr-2 h-4 w-4" /> Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(plant._id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {plants.map((plant) => (
+                <SelectablePlantCard
+                  key={plant._id}
+                  plant={plant}
+                  isCurrent={initialPlantId === plant._id}
+                  isSelected={selectedPlantId === plant._id}
+                  onSelect={handleSelectPlant}
+                  onRemove={handleRemove}
+                />
+              ))}
             </div>
           )}
         </CardContent>
       </Card>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editingPlant ? "Edit Plant" : "Add a New Plant"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingPlant
-                ? "Update the details for your plant."
-                : "Fill in the details for your new plant."}
-            </DialogDescription>
-          </DialogHeader>
-          <PlantForm
-            plant={editingPlant}
-            onFinished={() => setIsDialogOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {isDirty && (
+        <div className="sticky bottom-6 mt-6 bg-white/80 backdrop-blur-lg p-4 rounded-lg shadow-lg border border-stone-200/80 flex items-center justify-between animate-in fade-in-50">
+          <p className="text-sm font-medium text-stone-700">
+            You have unsaved changes.
+          </p>
+          <div className="flex gap-2">
+            <Button onClick={handleSave} disabled={setLatestPlant.isPending}>
+              <Check className="mr-2 h-4 w-4" />
+              {setLatestPlant.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setSelectedPlantId(initialPlantId)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

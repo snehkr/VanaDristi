@@ -13,6 +13,7 @@ import type {
   ChatHistoryItem,
   IdentificationResult,
 } from "../types";
+import { AxiosError } from "axios";
 
 export const useApi = () => {
   const apiClient = useApiClient();
@@ -65,6 +66,38 @@ export const useApi = () => {
     useMutation<unknown, Error, string>({
       mutationFn: (plantId) => apiClient.delete(`/plants/${plantId}`),
       onSuccess: () => queryClient.invalidateQueries({ queryKey: ["plants"] }),
+    });
+
+  // Latest Plant for Observations
+  const useGetLatestPlant = () =>
+    useQuery<{ _id: string } | null, Error>({
+      queryKey: ["plants", "latest"],
+      queryFn: async () => {
+        try {
+          const response = await apiClient.get("/plants/latest");
+          return response.data;
+        } catch (error) {
+          if (error instanceof AxiosError && error.response?.status === 404) {
+            return null;
+          }
+          throw error;
+        }
+      },
+    });
+
+  const useSetLatestPlant = () =>
+    useMutation<unknown, Error, string>({
+      mutationFn: (plantId) =>
+        apiClient.post("/plants/latest", { plant_id: plantId }),
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: ["plants", "latest"] }),
+    });
+
+  const useDeleteLatestPlant = () =>
+    useMutation<unknown, Error, void>({
+      mutationFn: () => apiClient.delete("/plants/latest"),
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: ["plants", "latest"] }),
     });
 
   // Sensor Data
@@ -161,5 +194,8 @@ export const useApi = () => {
     usePostChatMessage,
     useIdentifyPlant,
     useGetIdentifications,
+    useGetLatestPlant,
+    useSetLatestPlant,
+    useDeleteLatestPlant,
   };
 };
