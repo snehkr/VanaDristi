@@ -19,10 +19,12 @@ import {
   AlertTriangle,
   X,
   Bot,
+  TreePalm,
   ShieldAlert,
   BookOpen,
   HeartPulse,
   Stethoscope,
+  Lightbulb,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UseMutationResult } from "@tanstack/react-query";
@@ -115,14 +117,44 @@ const IdentificationResultDisplay = ({
                 <strong>Origin:</strong> {data.origin}
               </p>
               <p>
+                <strong>Lifespan:</strong> {data.lifespan}
+              </p>
+              <p>
                 <strong>Growth Habit:</strong> {data.growth_habit}
               </p>
               <p>
                 <strong>Flowering Season:</strong> {data.flowering_season}
               </p>
               <p>
+                <strong>Fruiting Season:</strong> {data.fruiting_season}
+              </p>
+              <p>
+                <strong>Toxicity:</strong> {data.toxicity}
+              </p>
+              <p>
                 <strong>Primary Uses:</strong> {data.uses.join(", ")}
               </p>
+              <p>
+                <strong>Symbolism / Cultural Value:</strong>{" "}
+                {data.symbolism_or_cultural_value}
+              </p>
+              <p>
+                <strong>Environmental Preferences:</strong>{" "}
+                {data.environmental_preferences}
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="propagation">
+            <AccordionTrigger>
+              <TreePalm className="h-4 w-4 mr-2" /> Propagation Methods
+            </AccordionTrigger>
+            <AccordionContent>
+              <ul className="list-disc list-inside space-y-2 text-sm">
+                {data.propagation_methods.map((method, index) => (
+                  <li key={index}>{method}</li>
+                ))}
+              </ul>
             </AccordionContent>
           </AccordionItem>
 
@@ -136,6 +168,41 @@ const IdentificationResultDisplay = ({
                   <li key={index}>{disease}</li>
                 ))}
               </ul>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="similar-species">
+            <AccordionTrigger>
+              <BookOpen className="h-4 w-4 mr-2" /> Similar Species
+            </AccordionTrigger>
+            <AccordionContent>
+              <ul className="list-disc list-inside space-y-2 text-sm">
+                {(Array.isArray(data.similar_species)
+                  ? data.similar_species
+                  : [data.similar_species]
+                ).map((species, index) => (
+                  <li key={index}>{species}</li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="conservation-status">
+            <AccordionTrigger>
+              <AlertTriangle className="h-4 w-4 mr-2" /> Conservation Status
+            </AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm">{data.conservation_status}</p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="fun-facts">
+            <AccordionTrigger>
+              <Lightbulb className="h-4 w-4 mr-2" />
+              Fun Facts
+            </AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm">{data.fun_fact}</p>
             </AccordionContent>
           </AccordionItem>
 

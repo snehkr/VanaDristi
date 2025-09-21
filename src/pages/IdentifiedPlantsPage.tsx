@@ -165,7 +165,10 @@ const IdentifiedPlantCard = ({ plant }: { plant: IdentificationResult }) => {
                   </AccordionTrigger>
                   <AccordionContent>
                     <ul className="list-disc list-inside space-y-2 text-sm">
-                      {plant.similar_species.map((species, i) => (
+                      {(Array.isArray(plant.similar_species)
+                        ? plant.similar_species
+                        : [plant.similar_species]
+                      ).map((species, i) => (
                         <li key={i}>{species}</li>
                       ))}
                     </ul>

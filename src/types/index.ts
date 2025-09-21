@@ -72,7 +72,7 @@ export interface IdentificationResult {
   common_diseases: string[];
   diagnosis_from_image: string;
   image_url: string;
-  similar_species: string[];
+  similar_species: string | string[];
   conservation_status: string;
   fun_fact: string;
 }
