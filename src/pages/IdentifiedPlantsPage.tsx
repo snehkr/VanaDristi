@@ -26,6 +26,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   BookOpen,
   Bot,
+  TreePalm,
+  Lightbulb,
   HeartPulse,
   History,
   ShieldAlert,
@@ -102,6 +104,9 @@ const IdentifiedPlantCard = ({ plant }: { plant: IdentificationResult }) => {
                       <strong>Origin:</strong> {plant.origin}
                     </p>
                     <p>
+                      <strong>Lifespan:</strong> {plant.lifespan}
+                    </p>
+                    <p>
                       <strong>Growth Habit:</strong> {plant.growth_habit}
                     </p>
                     <p>
@@ -109,8 +114,35 @@ const IdentifiedPlantCard = ({ plant }: { plant: IdentificationResult }) => {
                       {plant.flowering_season}
                     </p>
                     <p>
+                      <strong>Fruiting Season:</strong> {plant.fruiting_season}
+                    </p>
+                    <p>
+                      <strong>Toxicity:</strong> {plant.toxicity}
+                    </p>
+                    <p>
                       <strong>Primary Uses:</strong> {plant.uses.join(", ")}
                     </p>
+                    <p>
+                      <strong>Symbolism / Cultural Value:</strong>{" "}
+                      {plant.symbolism_or_cultural_value}
+                    </p>
+                    <p>
+                      <strong>Environmental Preferences:</strong>{" "}
+                      {plant.environmental_preferences}
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="propagation">
+                  <AccordionTrigger>
+                    <TreePalm className="h-4 w-4 mr-2" />
+                    Propagation Methods
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="list-disc list-inside space-y-2 text-sm">
+                      {plant.propagation_methods.map((method, i) => (
+                        <li key={i}>{method}</li>
+                      ))}
+                    </ul>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="diseases">
@@ -124,6 +156,37 @@ const IdentifiedPlantCard = ({ plant }: { plant: IdentificationResult }) => {
                         <li key={i}>{d}</li>
                       ))}
                     </ul>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="similar-species">
+                  <AccordionTrigger>
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Similar Species
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="list-disc list-inside space-y-2 text-sm">
+                      {plant.similar_species.map((species, i) => (
+                        <li key={i}>{species}</li>
+                      ))}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="conservation-status">
+                  <AccordionTrigger>
+                    <HeartPulse className="h-4 w-4 mr-2" />
+                    Conservation Status
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-sm">{plant.conservation_status}</p>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="fun-facts">
+                  <AccordionTrigger>
+                    <Lightbulb className="h-4 w-4 mr-2" />
+                    Fun Facts
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-sm">{plant.fun_fact}</p>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="ai-diagnosis">

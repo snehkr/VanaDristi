@@ -59,11 +59,20 @@ export interface IdentificationResult {
   family: string;
   origin: string;
   growth_habit: string;
+  lifespan: string;
   flowering_season: string;
+  fruiting_season: string;
   edible_or_medicinal: string;
+  toxicity: string;
+  propagation_methods: string[];
   uses: string[];
+  symbolism_or_cultural_value: string;
   care_summary: string;
+  environmental_preferences: string;
   common_diseases: string[];
   diagnosis_from_image: string;
   image_url: string;
+  similar_species: string[];
+  conservation_status: string;
+  fun_fact: string;
 }
