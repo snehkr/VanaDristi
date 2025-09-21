@@ -190,7 +190,9 @@ const LatestSensorCard = ({
       {sensorData && (
         <CardFooter className="text-xs text-stone-500 pt-2">
           From '{sensorData.plant_name}' at{" "}
-          {new Date(sensorData.timestamp).toLocaleTimeString("en-IN", {
+          {new Date(
+            sensorData.timestamp.replace(" ", "T").split(".")[0]
+          ).toLocaleTimeString("en-IN", {
             timeZone: "Asia/Kolkata",
             hour12: true,
           })}
